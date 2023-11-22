@@ -1,0 +1,100 @@
+################################################################################
+#
+# blap library for deep learning.
+# blap, sometimes it just hits you in the face.
+#
+# Copyright (C) 2017 Saul Rosa
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+# Location of the CUDA Toolkit binaries and libraries
+CUDA_INC_PATH  = $(CUDA_INSTALL_PATH)/include
+CUDA_BIN_PATH  = $(CUDA_INSTALL_PATH)/bin
+CUDA_LIB_PATH  = $(CUDA_INSTALL_PATH)/lib64
+
+# Common binaries
+NVCC            = $(CUDA_BIN_PATH)/nvcc
+GCC             = g++
+
+# CUDA code generation flags
+GENCODE_SM35    := -gencode arch=compute_50,code=sm_50
+GENCODE_FLAGS   := $(GENCODE_SM35)
+
+LDFLAGS   := -L$(CUDA_LIB_PATH) -lcudart
+CCFLAGS   := -m64
+NVCCFLAGS := -m64
+
+# Debug build flags
+ifeq ($(dbg),1)
+      CCFLAGS   += -g
+      NVCCFLAGS += -g -G
+      DBG := debug
+else
+      DBG := release
+      NVCCFLAGS += -O3
+      CCFLAGS += -O3
+endif
+
+# Add profiler output
+ifeq ($(prof),1)
+	NVCCFLAGS += --ptxas-options=-v
+endif
+
+TARGETDIR := ./bin/$(DBG)
+OBJDIR := ./obj/$(DBG)
+
+########## USER STUFF ###########
+LDFLAGS   		+= -L../util -lutilpy -L../nvmatrix -lnvmatrix -lcublas
+INCLUDES      	:= -I$(CUDA_INC_PATH) -I $(CUDA_SDK_PATH)/common/inc -I./include
+
+CUFILES	:= $(shell find . -name "*.cu")
+CU_DEPS	:= $(shell find . -name "*.cuh")
+CCFILES	:= $(shell find . -name "*.cpp")
+C_DEPS	:= $(shell find . -name "*.h")
+
+NVCCFLAGS += --compiler-options '-fPIC'
+LDFLAGS += -shared
+CCFLAGS += -fPIC
+TARGET := $(TARGETDIR)/libblap.so
+
+################################################################################
+# Set up target and object files
+################################################################################
+OBJS +=  $(patsubst %.cpp,$(OBJDIR)/%.cpp.o,$(CCFILES))
+OBJS +=  $(patsubst %.c,$(OBJDIR)/%.c.o,$(CFILES))
+OBJS +=  $(patsubst %.cu,$(OBJDIR)/%.cu.o,$(CUFILES))
+
+# Target rules
+all: makedirs $(TARGET)
+
+$(OBJDIR)/%.cu.o : %.cu $(CU_DEPS)
+	$(NVCC) $(NVCCFLAGS) $(GENCODE_FLAGS) $(INCLUDES) -o $@ -c $<
+
+$(OBJDIR)/%.cpp.o : %.cpp $(C_DEPS)
+	$(GCC) $(CCFLAGS) $(INCLUDES) -o $@ -c $<
+
+$(TARGET): $(OBJS)
+	$(GCC) $(CCFLAGS) -o $@ $+ $(LDFLAGS) 
+	ln -sf $(TARGET) .
+
+makedirs:
+	mkdir -p $(TARGETDIR)
+	mkdir -p $(OBJDIR)/src
+
+clean:
+	rm -rf ./obj
+
+

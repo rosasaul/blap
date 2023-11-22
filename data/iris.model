@@ -1,0 +1,24 @@
+learning_rate=0.001
+max_weight=0.5
+min_weight=0
+stop_threshold=0.001
+max_iterations=1000
+momentum_matching=0
+momentum_missmatch=0
+momentum_max=0
+momentum_step=0
+momentum_start=0
+momentum_rho=0
+lambda=0
+grad_optimizer=adam
+beta1=0.9
+beta2=0.999
+eta=10e-8
+weight_init_func=rand
+input_size=4
+layer:
+  output_size=10
+  activiation_function=ReLU
+layer:
+  output_size=3
+  activiation_function=softmax

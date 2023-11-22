@@ -1,0 +1,30 @@
+learning_rate=0.01
+momentum_matching=1
+momentum_missmatch=0.005
+momentum_max=2.5
+max_weight=0.5
+stop_threshold=0.0001
+max_iterations=60000
+momentum_step=0.01
+momentum=0.001
+weight_init_func=rand
+input_size=2
+layer:
+  output_size=4
+  activiation_function=tanh
+  [	0.152341	0.185562]
+  [	-2.36796	-2.37102]
+  [	0.500907	-0.000195577]
+  [	-0.510136	-0.315275]
+layer:
+  output_size=4
+  activiation_function=tanh
+  [	0.219406	1.59391	0.20187	-0.678571]
+  [	0.228645	0.804885	0.0456738	0.327571]
+  [	0.38095	-0.551412	0.357094	-0.194456]
+  [	0.0159459	-2.17981	-0.140148	0.79233]
+layer:
+  output_size=2
+  activiation_function=tanh
+  [	-0.814743	-0.277386	-0.0443953	1.29411]
+  [	0.99346	0.311048	-0.379921	-0.995348]

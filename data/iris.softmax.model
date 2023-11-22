@@ -1,0 +1,20 @@
+learning_rate=0.001
+momentum_matching=0.02
+momentum_missmatch=0.02
+momentum_max=1.0
+max_weight=0.5
+stop_threshold=0.001
+max_iterations=600000
+momentum_step=0
+momentum=0.001
+weight_init_func=rand
+input_size=4
+layer:
+  output_size=10
+  activiation_function=ReLU
+layer:
+  output_size=10
+  activiation_function=ReLU
+layer:
+  output_size=3
+  activiation_function=sigmoid
